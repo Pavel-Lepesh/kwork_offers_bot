@@ -9,6 +9,14 @@ set_of_offers = set()
 res_values = []
 
 
+def process_get_values():
+    try:
+        get_offers(set_of_offers)
+    except Exception as err:
+        print(err)
+        process_get_values()
+
+
 def get_offers(set_of_offers: set) -> None:
     try:
         options_chrome = webdriver.ChromeOptions()
@@ -18,15 +26,24 @@ def get_offers(set_of_offers: set) -> None:
             browser.get(url)
             WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'multilevel-list__label-title')))
             category_group1 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
-            category_group1[1].click()
+            for category in category_group1:
+                if category.text == 'Разработка и IT':
+                    category.click()
+                    break
 
             time.sleep(1)
             category_group2 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
-            category_group2[-3].click()
+            for category in category_group2:
+                if category.text == 'Скрипты и боты':
+                    category.click()
+                    break
 
             time.sleep(1)
             category_group3 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
-            category_group3[2].click()
+            for category in category_group3:
+                if category.text == 'Парсеры':
+                    category.click()
+                    break
 
             time.sleep(1)
             offers = browser.find_elements(By.XPATH, '//div[@class="wants-card__left"]/div/a')
