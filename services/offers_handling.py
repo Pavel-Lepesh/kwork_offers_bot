@@ -7,17 +7,18 @@ import time
 
 set_of_offers = set()
 res_values = []
+categories = []
 
 
-def process_get_values():
+def process_get_values() -> None:
     try:
-        get_offers(set_of_offers)
+        get_offers(set_of_offers, categories)
     except Exception as err:
         print(err)
         process_get_values()
 
 
-def get_offers(set_of_offers: set) -> None:
+def get_offers(set_of_offers: set, categories: list[str]) -> None:
     try:
         options_chrome = webdriver.ChromeOptions()
         options_chrome.add_argument('--headless')
@@ -27,21 +28,21 @@ def get_offers(set_of_offers: set) -> None:
             WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'multilevel-list__label-title')))
             category_group1 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
             for category in category_group1:
-                if category.text == 'Разработка и IT':
+                if category.text == categories[0]:
                     category.click()
                     break
 
             time.sleep(1)
             category_group2 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
             for category in category_group2:
-                if category.text == 'Скрипты и боты':
+                if category.text == categories[1]:
                     category.click()
                     break
 
             time.sleep(1)
             category_group3 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
             for category in category_group3:
-                if category.text == 'Парсеры':
+                if category.text == categories[2]:
                     category.click()
                     break
 
@@ -60,4 +61,3 @@ def get_offers(set_of_offers: set) -> None:
                 res_values.append(offers_arg)
     except Exception as err:
         print(err)
-
