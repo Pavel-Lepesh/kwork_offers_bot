@@ -1,5 +1,6 @@
 from aiogram import Bot, Dispatcher
 import asyncio
+import logging
 
 from config.config import load_config
 from keyboards.main_menu import set_main_menu
@@ -7,6 +8,7 @@ from handlers import user_handlers, other_handlers
 
 
 async def main():
+    logging.basicConfig(level=logging.INFO)
     bot: Bot = Bot(token=load_config().tg_bot.token, parse_mode='HTML')
     dp: Dispatcher = Dispatcher()
     await set_main_menu(bot)

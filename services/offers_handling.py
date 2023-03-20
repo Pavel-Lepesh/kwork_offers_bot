@@ -21,10 +21,10 @@ def process_get_values() -> None:
 def get_offers(set_of_offers: set, categories: list[str]) -> None:
     try:
         options_chrome = webdriver.ChromeOptions()
-        options_chrome.add_argument('--no-sandbox')
+        # options_chrome.add_argument('--no-sandbox')
         options_chrome.add_argument('--headless')
         url = 'https://kwork.ru/projects?a=1'
-        driver = webdriver.Chrome(executable_path='/home/lepesh/kwork_offers_bot/chromedriver', options=options_chrome)
+        driver = webdriver.Chrome(options=options_chrome)
         with driver as browser:
             browser.get(url)
             WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'multilevel-list__label-title')))
