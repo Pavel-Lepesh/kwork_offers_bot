@@ -3,23 +3,17 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-import time
 
 
-set_of_offers = set()
-res_values = []
-categories = []
-
-
-async def process_get_values() -> None:
+async def process_get_values(set_of_offers: set, res_values: list, categories: list) -> None:
     try:
-        await get_offers(set_of_offers, categories)
+        await get_offers(set_of_offers, res_values, categories)
     except Exception as err:
         print(err)
-        await process_get_values()
+        await process_get_values(set_of_offers, res_values, categories)
 
 
-async def get_offers(set_of_offers: set, categories: list[str]) -> None:
+async def get_offers(set_of_offers: set, res_values: list, categories: list) -> None:
     try:
         options_chrome = webdriver.ChromeOptions()
         # options_chrome.add_argument('--no-sandbox')
@@ -35,21 +29,21 @@ async def get_offers(set_of_offers: set, categories: list[str]) -> None:
                     category.click()
                     break
 
-            await asyncio.sleep(1)  # time.sleep(1)
+            await asyncio.sleep(1.5)
             category_group2 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
             for category in category_group2:
                 if category.text == categories[1]:
                     category.click()
                     break
 
-            await asyncio.sleep(1)  # time.sleep(1)
+            await asyncio.sleep(1.5)
             category_group3 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
             for category in category_group3:
                 if category.text == categories[2]:
                     category.click()
                     break
 
-            await asyncio.sleep(1)  # time.sleep(1)
+            await asyncio.sleep(1.5)
             offers = browser.find_elements(By.XPATH, '//div[@class="wants-card__left"]/div/a')
             prices = browser.find_elements(By.XPATH,
                                            "//div[@class='wants-card__header-price wants-card__price m-hidden']")
