@@ -6,8 +6,8 @@ with open('kwork_categories.json', encoding='utf-8') as file:
 
 
 HIGH_CATEGORIES = [cat for cat in LEXICON_CATEGORIES.keys()]
-MID_CATEGORIES = list(chain(*[cat.keys() for cat in LEXICON_CATEGORIES.values()]))
-LOW_CATEGORIES = list(chain(*chain(*[cat.values() for cat in LEXICON_CATEGORIES.values()])))
+MID_CATEGORIES = list(chain(*[cat.keys() for cat in LEXICON_CATEGORIES.values()]))  # используется для проверки в хэндлере
+LOW_CATEGORIES = list(chain(*chain(*[cat.values() for cat in LEXICON_CATEGORIES.values()])))  # используется для проверки в хэндлере
 
 
 LEXICON_COMMANDS = {'/start': 'Приветствие',

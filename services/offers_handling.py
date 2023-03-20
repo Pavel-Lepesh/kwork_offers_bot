@@ -1,3 +1,4 @@
+import asyncio
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -10,15 +11,15 @@ res_values = []
 categories = []
 
 
-def process_get_values() -> None:
+async def process_get_values() -> None:
     try:
-        get_offers(set_of_offers, categories)
+        await get_offers(set_of_offers, categories)
     except Exception as err:
         print(err)
-        process_get_values()
+        await process_get_values()
 
 
-def get_offers(set_of_offers: set, categories: list[str]) -> None:
+async def get_offers(set_of_offers: set, categories: list[str]) -> None:
     try:
         options_chrome = webdriver.ChromeOptions()
         # options_chrome.add_argument('--no-sandbox')
@@ -34,21 +35,21 @@ def get_offers(set_of_offers: set, categories: list[str]) -> None:
                     category.click()
                     break
 
-            time.sleep(1)
+            await asyncio.sleep(1)  # time.sleep(1)
             category_group2 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
             for category in category_group2:
                 if category.text == categories[1]:
                     category.click()
                     break
 
-            time.sleep(1)
+            await asyncio.sleep(1)  # time.sleep(1)
             category_group3 = browser.find_elements(By.CLASS_NAME, 'multilevel-list__label-title')
             for category in category_group3:
                 if category.text == categories[2]:
                     category.click()
                     break
 
-            time.sleep(1)
+            await asyncio.sleep(1)  # time.sleep(1)
             offers = browser.find_elements(By.XPATH, '//div[@class="wants-card__left"]/div/a')
             prices = browser.find_elements(By.XPATH,
                                            "//div[@class='wants-card__header-price wants-card__price m-hidden']")
@@ -61,5 +62,6 @@ def get_offers(set_of_offers: set, categories: list[str]) -> None:
                     continue
                 set_of_offers.add(offers_arg)
                 res_values.append(offers_arg)
+            print()
     except Exception as err:
         print(err)

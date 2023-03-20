@@ -34,11 +34,12 @@ async def process_help_command(message: Message):
 
 
 @router.message(Command(commands='cancel'))
-async def process_cancel_command(message: Message):
+async def process_cancel_command(message: Message, state: FSMContext):
     global process_status
     process_status = False
     categories.clear()
     await message.answer(LEXICON_RU['cancel'])
+    await state.set_state(default_state)
 
 
 @router.message(Command(commands='beginning'), StateFilter(default_state))
@@ -52,8 +53,18 @@ async def process_beginning_command(message: Message, state: FSMContext):  # в�
 async def process_callback_high(callback: CallbackQuery, state: FSMContext):  # выбираем вторую категорию
     categories.append(callback.data)
     await callback.message.edit_text(text=f'<b>{callback.data}</b>\n<i>Теперь выберите подкатегорию.</i>',
-                                     reply_markup=create_categories_kb(*LEXICON_CATEGORIES[callback.data].keys()))
+                                     reply_markup=create_categories_kb(*LEXICON_CATEGORIES[callback.data].keys(),
+                                                                       goback_arrow='↩'))
     await state.set_state(FSMFillForm.choose_second)
+
+
+@router.callback_query(StateFilter(FSMFillForm.choose_second),
+                       Text(text='goback_arrow'))
+async def second_goback_arrow(callback: CallbackQuery, state: FSMContext):
+    categories.clear()  # очищаем категории от первого выбора
+    await callback.message.edit_text(text='<b>Выберите категорию!</b>',
+                                     reply_markup=create_categories_kb(*HIGH_CATEGORIES))
+    await state.set_state(FSMFillForm.choose_first)
 
 
 @router.callback_query(StateFilter(FSMFillForm.choose_second),
@@ -62,8 +73,19 @@ async def process_callback_mid(callback: CallbackQuery, state: FSMContext):  # �
     categories.append(callback.data)
     await callback.message.edit_text(text=f'{callback.data}\nОтлично! Теперь выберите что будем искать.',
                                      reply_markup=create_categories_kb(
-                                         *LEXICON_CATEGORIES[callback.message.text.split('\n')[0]][callback.data]))
+                                         *LEXICON_CATEGORIES[callback.message.text.split('\n')[0]][callback.data],
+                                         goback_arrow='↩'))
     await state.set_state(FSMFillForm.choose_third)
+
+
+@router.callback_query(StateFilter(FSMFillForm.choose_third),
+                       Text(text='goback_arrow'))
+async def third_goback_arrow(callback: CallbackQuery, state: FSMContext):
+    del categories[-1]  # удаляем предыдущую категорию
+    await callback.message.edit_text(text=f'<b>{categories[-1]}</b>\n<i>Теперь выберите подкатегорию.</i>',
+                                     reply_markup=create_categories_kb(*LEXICON_CATEGORIES[categories[-1]].keys(),
+                                                                       goback_arrow='↩'))
+    await state.set_state(FSMFillForm.choose_second)
 
 
 @router.callback_query(StateFilter(FSMFillForm.choose_third),
@@ -73,7 +95,7 @@ async def process_callback_low(callback: CallbackQuery, bot: Bot):
     await callback.message.delete()
     global process_status
     process_status = True
-    process_get_values()
+    await process_get_values()
     while process_status:
         if res_values:
             for title, ref, price in res_values:
@@ -81,5 +103,5 @@ async def process_callback_low(callback: CallbackQuery, bot: Bot):
                                                                            f'<b>{title}</b>\n'
                                                                            f'{price}')
             res_values.clear()
-        process_get_values()
+        await process_get_values()
         await asyncio.sleep(15)
