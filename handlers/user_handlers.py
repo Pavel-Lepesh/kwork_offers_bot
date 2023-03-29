@@ -25,9 +25,10 @@ class FSMFillForm(StatesGroup):
     in_process = State()
 
 
-@router.message(StateFilter(default_state), CommandStart())
-async def process_start_command(message: Message):
+@router.message(CommandStart())
+async def process_start_command(message: Message, state: FSMContext):
     await message.answer(LEXICON_RU['start'])
+    await state.set_state(FSMFillForm.start_program)
 
 
 @router.message(Command(commands='help'))
@@ -42,10 +43,10 @@ async def process_cancel_command(message: Message, state: FSMContext):
     root_categories[user].clear()  # очищаем категории пользователя
     root_offers_set[user].clear()
     await message.answer(LEXICON_RU['cancel'])
-    await state.set_state(default_state)
+    await state.set_state(FSMFillForm.start_program)
 
 
-@router.message(StateFilter(default_state), Command(commands='beginning'))
+@router.message(StateFilter(FSMFillForm.start_program), Command(commands='beginning'))
 async def process_beginning_command(message: Message, state: FSMContext):  # выбираем первую категорию
     await message.answer(text='<b>Выберите категорию!</b>',
                          reply_markup=create_categories_kb(*HIGH_CATEGORIES, choose_all='✅'))
@@ -140,8 +141,8 @@ async def process_callback_final(callback: CallbackQuery, bot: Bot, state: FSMCo
     while process_status[user]:
         if res_values:
             for title, ref, price in res_values:
-                await bot.send_message(chat_id=callback.from_user.id, text=f'{hide_link(ref)}'
-                                                                           f'<b>{title}</b>\n'
+                await bot.send_message(chat_id=callback.from_user.id, text=f'<b>{title}</b>\n'
+                                                                           f'<a href="{ref}">Ссылка</a>\n'
                                                                            f'{price}')
             res_values.clear()
         await process_get_values(root_offers_set[user], res_values, categories)  # повторный запуск парсера
