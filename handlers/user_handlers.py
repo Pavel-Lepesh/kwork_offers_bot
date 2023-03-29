@@ -25,7 +25,7 @@ class FSMFillForm(StatesGroup):
     in_process = State()
 
 
-@router.message(CommandStart())
+@router.message(StateFilter(default_state), CommandStart())
 async def process_start_command(message: Message):
     await message.answer(LEXICON_RU['start'])
 
@@ -37,13 +37,15 @@ async def process_help_command(message: Message):
 
 @router.message(Command(commands='cancel'))
 async def process_cancel_command(message: Message, state: FSMContext):
-    process_status[message.from_user.id] = False
-    root_categories[message.from_user.id].clear()  # очищаем категории пользователя
+    user = message.from_user.id
+    process_status[user] = False
+    root_categories[user].clear()  # очищаем категории пользователя
+    root_offers_set[user].clear()
     await message.answer(LEXICON_RU['cancel'])
     await state.set_state(default_state)
 
 
-@router.message(Command(commands='beginning'), StateFilter(default_state))
+@router.message(StateFilter(default_state), Command(commands='beginning'))
 async def process_beginning_command(message: Message, state: FSMContext):  # выбираем первую категорию
     await message.answer(text='<b>Выберите категорию!</b>',
                          reply_markup=create_categories_kb(*HIGH_CATEGORIES, choose_all='✅'))
