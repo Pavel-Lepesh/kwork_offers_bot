@@ -4,9 +4,7 @@ from aiogram import Router, Bot
 from aiogram.filters import Command, CommandStart, Text, StateFilter
 from aiogram.filters.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
 from aiogram.types import Message, CallbackQuery
-from aiogram.utils.markdown import hide_link
 
 from lexicon.lexicon import LEXICON_RU, HIGH_CATEGORIES, MID_CATEGORIES, LEXICON_CATEGORIES, LOW_CATEGORIES
 from services.offers_handling import process_get_values

@@ -16,10 +16,10 @@ async def process_get_values(set_of_offers: set, res_values: list, categories: l
 async def get_offers(set_of_offers: set, res_values: list, categories: list):
     try:
         options_chrome = webdriver.ChromeOptions()
-        #options_chrome.add_argument('--no-sandbox')
+        options_chrome.add_argument('--no-sandbox')
         options_chrome.add_argument('--headless')
         url = 'https://kwork.ru/projects?a=1'
-        driver = webdriver.Chrome(options=options_chrome)
+        driver = webdriver.Chrome(executable_path='/home/kwork_offers_bot/services/chromedriver', options=options_chrome)
         with driver as browser:
             try:
                 browser.get(url)
